@@ -5,10 +5,12 @@ class PropertiesController < ApplicationController
     property_type = params[:property_type]
     marketing_type = params[:marketing_type]
 
-    return render json: { error: "Invalid parameters" }, status: :bad_request if lat.zero? || lng.zero? || property_type.blank? || marketing_type.blank?
+    errors = []
+    errors << "All parameters must be provided" if lat.zero? || lng.zero? || property_type.blank? || marketing_type.blank?
+    errors << "Invalid Property Type" if !property_type.in?(Property.select(:property_type).distinct.map(&:property_type))
+    errors << "Invalid Marketing Type" if !marketing_type.in?(Property.select(:offer_type).distinct.map(&:offer_type))
 
-
-
+    return render json: { errors: errors } unless errors.empty?
     properties = Property
                   .where(property_type: params[:property_type], offer_type: params[:marketing_type])
                   .where("earth_distance(ll_to_earth(?, ?), ll_to_earth(lat, lng)) <= ?", params[:lat], params[:lng], 5000).to_a
@@ -16,7 +18,7 @@ class PropertiesController < ApplicationController
     if properties.present?
       render json: properties
     else
-      render json: { message: "No properties found within 5 km radius." }, status: :not_found
+      render json: { message: "No properties found within 5 km radius." }
     end
   end
 end
