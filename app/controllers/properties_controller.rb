@@ -13,10 +13,17 @@ class PropertiesController < ApplicationController
     return render json: { errors: errors } unless errors.empty?
     properties = Property
                   .where(property_type: params[:property_type], offer_type: params[:marketing_type])
-                  .where("earth_distance(ll_to_earth(?, ?), ll_to_earth(lat, lng)) <= ?", params[:lat], params[:lng], 5000).to_a
+                  .where("earth_distance(ll_to_earth(?, ?), ll_to_earth(lat, lng)) <= ?", params[:lat], params[:lng], 5000).page(params[:page])
 
     if properties.present?
-      render json: properties
+      render json: {
+        properties: properties,
+        meta: {
+          current_page: properties.current_page,
+          total_pages: properties.total_pages,
+          total_count: properties.total_count
+        }
+      }
     else
       render json: { message: "No properties found within 5 km radius." }
     end
