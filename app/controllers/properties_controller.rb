@@ -5,7 +5,8 @@ class PropertiesController < ApplicationController
     if property.valid?
       properties = Property
                     .where(property_type: property.property_type, offer_type: property.offer_type)
-                    .where("earth_distance(ll_to_earth(?, ?), ll_to_earth(lat, lng)) <= ?", property.lat, property.lng, 5000).page(params[:page])
+                    .where("earth_distance(ll_to_earth(?, ?), ll_to_earth(lat, lng)) <= ?", property.lat, property.lng, 5000)
+                    .order(Arel.sql("house_number IS NULL, zip_code IS NULL, street IS NULL, city IS NULL, price ASC")).page(params[:page])
       if properties.present?
         render json: {
           properties: properties,
