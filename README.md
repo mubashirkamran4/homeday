@@ -50,6 +50,11 @@ As we would have to deal with a lot of records for whole of Germany e.g., so it 
 
 * Implementing pagination via `kaminari` gem, as I assumed that this API's result is going to be used somewhere in UI, so it would be nicer to paginate it and user can definitely see total pages, next page links to navigate.
 
-* Lastly, just keeping User expereince in mind, I noticed many properties were not updated with proper addresses like they were missing zip_code, city, house_number or street. So we can instead show those properties first where we have complete details and then later with missing details on the last pages.
+### UX
+
+* Lastly, just keeping User expereince in mind, I noticed many properties were not updated with proper addresses like they were missing zip_code, city, house_number or street. So we can instead show those properties first where we have complete details and then later with missing details on the last pages. 
+
+* Also, some properties were without properties, either nil or 0. They might of less interest to the user and can be pushed to the very end.
+
 
 
