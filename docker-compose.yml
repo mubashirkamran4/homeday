@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14.15
+    restart: always
+    environment:
+      POSTGRES_USER: homeday_user
+      POSTGRES_PASSWORD: homeday5612
+      POSTGRES_DB: property_service
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/properties.sql:/docker-entrypoint-initdb.d/properties.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "homeday_user", "-d", "property_service", "-W", "homeday5612"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  web:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://homeday_user:homeday5612@db:5432/property_service
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    command: ["bash", "-c", "bin/rails db:create && bin/rails db:migrate && bin/rails server -b 0.0.0.0"]
+
+  test:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://homeday_user:homeday5612@db:5432/property_service_test
+      RAILS_ENV: test
+    volumes:
+      - .:/app
+    command: ["bash", "-c", "bin/rails db:create db:schema:load && tail -f /dev/null"]
+
+
+volumes:
+  pgdata: {}
+  bundle_cache: {} 

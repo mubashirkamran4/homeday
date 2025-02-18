@@ -4,7 +4,7 @@ default: &default
   pool: 5
   username: homeday_user
   password: homeday5612
-  host: localhost
+  host: db
 
 development:
   <<: *default
